@@ -1,4 +1,5 @@
-import { json, Router } from "express";
+import { Router } from "express";
+import { compare } from "bcrypt";
 import { responseLog } from "../responseLogger";
 import { IUser } from "../../../shared/api_interfaces";
 import User from "../models/user";
@@ -52,35 +53,73 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.put("/passwordchange", async (req, res) => {
-  // Make sure we have a valid auth
-  if(!req.validAuth) {
+router.get("/me", async (req, res) => {
+  if (!req.userId) {
     res.status(401);
-    const responseObj = await responseLog("Invalid auth", "", "[PUT]/auth/passwordchange");
+    const responseObj = await responseLog(
+      "Invalid auth",
+      "Not a logged in user",
+      "[GET]/auth/me"
+    );
     res.json(responseObj);
     return;
   }
+
+  if (!req.validAuth) {
+    res.status(401);
+    const responseObj = await responseLog(
+      "Invalid auth",
+      "",
+      "[PUT]/auth/passwordchange"
+    );
+    res.json(responseObj);
+    return;
+  }
+
+  const user = await User.findOne({ _id: req.userId });
+
+  res.json(user);
 });
 
-router.delete("/logoutall", async(req, res) => {
-  if(!req.validAuth) {
+router.delete("/logoutall", async (req, res) => {
+  if (!req.validAuth) {
     res.status(401);
-    const responseObj = await responseLog("Unauthorised", `${req.userId} tried to log out of all devices, but did not have any valid auth`, "[DELETE]/auth/logoutall");
+    const responseObj = await responseLog(
+      "Unauthorised",
+      `${req.userId} tried to log out of all devices, but did not have any valid auth`,
+      "[DELETE]/auth/logoutall"
+    );
     res.json(responseObj);
-    return
+    return;
   }
 
-  if(!req.userId) {
+  if (!req.userId) {
     // idk why we'd get here but justin case
     res.status(500);
-    const responseObj = await responseLog("Invalid perameters", "Logout of all devices, but no user id was found", "[DELETE]/auth/logoutall");
+    const responseObj = await responseLog(
+      "Invalid perameters",
+      "Logout of all devices, but no user id was found",
+      "[DELETE]/auth/logoutall"
+    );
     res.json(responseObj);
-
   }
-
-  const user = await User.updateOne({_id: req.userId})
-
-})
+  let success;
+  try {
+    success = await User.updateOne(
+      { _id: req.userId },
+      { $inc: { refreshCount: 1 } }
+    );
+  } catch (e) {
+    console.log(e);
+  }
+  if (success.ok) {
+    res.clearCookie("refresh-token");
+    res.clearCookie("access-token");
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(500);
+  }
+});
 
 router.post("/login", async (req, res) => {
   const body = req.body as IUser;
@@ -90,7 +129,7 @@ router.post("/login", async (req, res) => {
     const responseObj = await responseLog(
       "Already logged in",
       `User ${body.email} tried to log in, but was already logged in as ${req.userId}`,
-      "[POST/auth/login]"
+      "[POST]/auth/login"
     );
     res.json(responseObj);
     return;
@@ -110,18 +149,34 @@ router.post("/login", async (req, res) => {
     res.json(responseObj);
     return;
   }
-  const user = await User.findById({ id: req.userId });
-  console.log(user);
+  const user = await User.findOne({ email: req.body.email });
+  const isValid = await compare(req.body.password, user.password);
+
+  if (!isValid) {
+    // If the password was not valid
+    res.status(401);
+    const responseObj = await responseLog(
+      "Invalid password",
+      `User ${req.body.email} invalid password`,
+      "[POST]/auth/login"
+    );
+    res.json(responseObj);
+    return
+  }
+
+  const { refreshToken, accessToken } = createToken(user);
+
+  res.cookie("refresh-token", refreshToken);
+  res.cookie("access-token", accessToken);
+  res.sendStatus(200);
 });
 
 router.get("/check", (req, res) => {
-  console.log(req.cookies);
-  
-  if(req.validAuth) {
+  if (req.validAuth) {
     res.sendStatus(200);
   } else {
     res.sendStatus(401);
   }
-})
+});
 
 export default router;

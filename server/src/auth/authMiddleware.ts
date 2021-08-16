@@ -34,8 +34,6 @@ const authMiddleware = async (req: Express.Request, res, next) => {
   }
 
   const user: IUser = await User.findById(data.userId);
-  console.log({ user });
-  console.log({ data });
 
   if (data.refreshCount !== user.refreshCount) {
     req.validAuth = false;

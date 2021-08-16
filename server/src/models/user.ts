@@ -3,7 +3,6 @@ import { Schema, model } from "mongoose";
 const bcrypt = require("bcrypt");
 
 const userSchema = new Schema({
-  isAnonymous: { type: Boolean, required: true, default: true },
   refreshCount: { type: Number, required: true, default: 0 },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
