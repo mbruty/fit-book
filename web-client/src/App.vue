@@ -1,21 +1,24 @@
 <template>
-  <v-app>
-    <v-main>
+  <main>
+    <Nav></Nav>
+    <div class="content">
       <router-view/>
-    </v-main>
-  </v-app>
+    </div>
+  </main>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import Nav from './components/Nav.vue';
 
 export default defineComponent({
   name: 'App',
-
-  data() {
-    return {
-      //
-    };
+  components: {
+    Nav,
   },
 });
 </script>
+
+<style>
+  @import './assets/resources.css';
+</style>
