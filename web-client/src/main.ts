@@ -1,9 +1,15 @@
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faSearch, faChevronRight, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { createApp } from 'vue';
-import vuetify from './plugins/vuetify';
-import App from './App.vue';
 import router from './router';
+import App from './App.vue';
+
+library.add(faSearch);
+library.add(faChevronRight);
+library.add(faExclamationTriangle);
 
 createApp(App)
   .use(router)
-  .use(vuetify)
+  .component('font-awesome-icon', FontAwesomeIcon)
   .mount('#app');
