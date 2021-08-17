@@ -5,6 +5,7 @@ import authMiddleware from "./auth/authMiddleware";
 import * as cookieParser from "cookie-parser";
 const express = require("express");
 const morgan = require('morgan')
+const cors = require('cors');
 config();
 
 interface Asdf {
@@ -22,6 +23,10 @@ async function startServer() {
   app.use(express.json()); // Json Parser
   app.use(authMiddleware); // Our own auth middleware
   app.use(morgan('dev')) // Logging
+  app.use(cors({
+    origin: 'http://localhost:8080',
+    credentials: true,
+  }));
   app.use("/api", router); // API router
   const port = process.env.PORT || 80;
   await new Promise((resolve) => app.listen({ port }, resolve));
