@@ -211,7 +211,11 @@ export default defineComponent({
     outline: 0;
   }
 
-  @media only screen and (max-width: 700px) {
+  .header__actions--mobile {
+    display: none;
+  }
+
+  @media only screen and (max-width: 800px) {
     .header__actions {
       display: none;
     }
