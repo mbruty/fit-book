@@ -22,13 +22,15 @@ router.post("/create", async (req, res) => {
   }
 
   // Validate we have everything
-  if (!body.email || !body.password) {
+  if (!body.email || !body.password || !body.nick || !body.skillLevel) {
     res.status(400);
 
     const responseObj = await responseLog(
       "Missing required parameters",
       `Missing ${!body.email ? "email " : ""}${
         !body.password ? "password " : ""
+      }${!body.nick ? "nick name " : ""}${
+        !body.skillLevel ? "skill level " : ""
       }from body`,
       "[POST]/auth/create"
     );
@@ -161,7 +163,7 @@ router.post("/login", async (req, res) => {
       "[POST]/auth/login"
     );
     res.json(responseObj);
-    return
+    return;
   }
 
   const { refreshToken, accessToken } = createToken(user);

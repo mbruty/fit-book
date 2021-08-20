@@ -6,6 +6,8 @@ const userSchema = new Schema({
   refreshCount: { type: Number, required: true, default: 0 },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  skillLevel: { type: String, required: true, default: 'beginner' },
+  nick: { type: String, required: true },
 });
 
 userSchema.pre("updateOne", function (next) {
