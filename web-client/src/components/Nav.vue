@@ -2,12 +2,22 @@
   <div v-if="showNav" class="header__actions colour--primary">
     <div class="a__container flex--horizontal flex--between p-auto nav">
       <router-link to="/">
-        <div class="logo text-align-centre flex--vertical flex--centre">
+        <div class="logo text-align-centre flex--vertical flex--centre a__navlink">
           <h1 class="p-auto">FITBOOK</h1>
         </div>
       </router-link>
-      <div class="flex--horizontal">
-        <form @submit.prevent="search" style="padding-right: 2em;">
+      <div id="nav-items" class="flex--horizontal">
+        <router-link to="/workouts/browse">
+          <div class="logo text-align-centre flex--vertical flex--centre a__navlink">
+            <h3 class="p-auto">BROWSE WORKOUTS</h3>
+          </div>
+        </router-link>
+        <router-link to="/workouts/create">
+          <div class="logo text-align-centre flex--vertical flex--centre a__navlink">
+            <h3 class="p-auto">CREATE A WORKOUT</h3>
+          </div>
+        </router-link>
+        <form @submit.prevent="search">
           <div class="flex--vertical flex--centre">
             <div class="flex--horizontal">
               <div class="searchform">
@@ -90,6 +100,16 @@
                 Log in / Sign up
               </router-link>
             </div>
+            <router-link to="/workouts/browse">
+              <div class="logo text-align-centre flex--vertical flex--centre a__navlink">
+                <h3 class="p-auto">BROWSE WORKOUTS</h3>
+              </div>
+            </router-link>
+            <router-link to="/workouts/create">
+              <div class="logo text-align-centre flex--vertical flex--centre a__navlink">
+                <h3 class="p-auto">CREATE A WORKOUT</h3>
+              </div>
+            </router-link>
           </div>
         </div>
       </transition>
@@ -134,6 +154,27 @@ export default defineComponent({
 </script>
 
 <style>
+
+  #nav-items > * {
+    padding-right: 2rem;
+  }
+  .a__navlink > * {
+    color: white;
+  }
+
+  .a__navlink::after {
+    transition: all 500ms cubic-bezier(.68,-0.55,.27,1.55);
+    content: '';
+    width: 0%;
+    height: 2px;
+    border-radius: 2px;
+    background-color: white;
+  }
+
+  .a__navlink:hover::after {
+    width: 100%;
+  }
+
   .header__actions,
   .header__actions--mobile {
     width: 100%;
@@ -215,7 +256,7 @@ export default defineComponent({
     display: none;
   }
 
-  @media only screen and (max-width: 800px) {
+  @media only screen and (max-width: 1300px) {
     .header__actions {
       display: none;
     }
