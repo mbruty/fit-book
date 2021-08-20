@@ -8,3 +8,5 @@ export const user = reactive({
   nick: '',
   isLoggedIn: false,
 });
+
+export const breadcrumb = ref<Array<string>>([]);
