@@ -34,9 +34,18 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Create A Workout',
     component: LoginSignup,
     meta: {
-      title: 'Search',
+      title: 'Create A Workout',
       breadcrumb: ['workouts'],
       requiresAuth: true,
+    },
+  },
+  {
+    path: '/workouts/browse',
+    name: 'Browse Workouts',
+    component: LoginSignup,
+    meta: {
+      title: 'Browse Workouts',
+      breadcrumb: ['workouts'],
     },
   },
 ];
@@ -49,7 +58,13 @@ const router = createRouter({
 router.afterEach((to) => {
   window.document.title = `FITBOOK${to.meta.title ? ` - ${to.meta.title}` : ''}`;
 
-  breadcrumb.value = to.meta.breadcrumb ? (to.meta.breadcrumb) as Array<string> : [''];
+  // An empty array will cause the breadcrumb to not render
+  breadcrumb.value = to.meta.breadcrumb ? (to.meta.breadcrumb) as Array<string> : [];
+
+  // If we aren't on the home route, prepend 'home' to the array
+  if (to.meta.title !== 'Home') {
+    breadcrumb.value = ['home', ...breadcrumb.value];
+  }
 });
 
 router.beforeEach((to, from, next) => {
@@ -57,6 +72,11 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !user.isLoggedIn) {
     next('/login');
     return;
+  }
+
+  // If we ever get routed to /home, redirect to /
+  if (to.path === '/home') {
+    next('/');
   }
 
   next();
