@@ -173,9 +173,10 @@ router.post("/login", async (req, res) => {
   res.sendStatus(200);
 });
 
-router.get("/check", (req, res) => {
+router.get("/check", async (req, res) => {
   if (req.validAuth) {
-    res.sendStatus(200);
+    res.status(200);
+    res.json( await User.findById(req.userId, { nick: 1 }) ); // The userid will have already been validated before, so this will always be valid
   } else {
     res.sendStatus(401);
   }
